@@ -8,6 +8,9 @@
 4. Keep existing archives immutable until migration and ownership are verified.
 5. Allow browser and SMB access without exposing the full Linux filesystem.
 6. Make storage failures visible through repeatable health checks.
+7. Make Pi-hole the router-advertised DNS service without creating a public
+   resolver.
+8. Use DDNS and one VPN entry point instead of exposing application ports.
 
 ## Storage tiers
 
@@ -61,18 +64,26 @@ filesystem.
 flowchart LR
     Local["Local devices"]
     Remote["Remote devices"]
+    Router["Router DHCP and firewall"]
+    DDNS["No-IP DDNS"]
     VPN["WireGuard"]
     Services["Private services"]
     Storage["Approved storage"]
 
-    Local --> Services
-    Remote --> VPN
+    Local --> Router
+    Router --> Services
+    Remote --> DDNS
+    DDNS --> Router
+    Router --> VPN
     VPN --> Services
     Services --> Storage
 ```
 
 - LAN clients connect directly to private service addresses.
-- Remote clients connect through WireGuard.
+- Router DHCP advertises Pi-hole as the DNS server for LAN clients.
+- Pi-hole forwards uncached queries to the local Unbound resolver.
+- No-IP tracks the changing public address without exposing any application.
+- Remote clients enter through a single WireGuard UDP port forward.
 - No Immich, File Browser, OctoPrint or SMB port needs public forwarding.
 - File Browser is rooted at `/srv/filebrowser`, not `/`.
 - Existing photo archives are mounted read-only inside Immich.
@@ -99,3 +110,14 @@ media. A recoverable backup requires both:
 
 The legacy USB disk in this build is not considered a valid backup target after
 SMART reported unreadable sectors.
+
+## Service inventory
+
+| Layer | Components |
+| --- | --- |
+| Base system | Raspberry Pi OS, NVMe boot, SSH, systemd |
+| Network | Router DHCP/DNS, Pi-hole, Unbound, No-IP, WireGuard |
+| Storage | ext4 media disk, bind mounts, Samba, File Browser |
+| Cloud application | Docker, Compose, Immich, PostgreSQL, Valkey, machine learning |
+| Devices and media | OctoPrint, Kodi, RetroPie, EmulationStation |
+| Reliability | zram, fallback swap, PWM cooling, SMART checks, system image |

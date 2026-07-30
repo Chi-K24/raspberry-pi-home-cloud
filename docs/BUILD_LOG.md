@@ -134,23 +134,48 @@ Mobile uploads were tested with a few selected assets before automatic album
 backup was enabled. The resulting files were verified directly on the media
 disk.
 
-## 8. Validate existing applications
+## 8. Configure router DNS, DDNS and private VPN access
+
+The Raspberry Pi received a reserved LAN address from the router. LAN DHCP was
+configured to advertise Pi-hole as DNS, with Pi-hole forwarding recursive
+queries to Unbound.
+
+The No-IP DUC maintained a stable private hostname for the changing home
+address. The router exposed only one UDP forward for WireGuard. Application,
+DNS and file-sharing ports remained private.
+
+WireGuard peers were configured individually and remote access was validated
+with hostname resolution, a current VPN handshake, Pi-hole DNS through the
+tunnel and a private application request.
+
+## 9. Add memory and recovery safeguards
+
+Compressed zram and a loopback/file-backed swap fallback were enabled to absorb
+temporary memory spikes from machine learning and transcoding.
+
+A compressed bootable system image and checksum were created as an OS recovery
+point. The recovery plan treats the Immich database, original media and
+untracked secrets as separate backup requirements.
+
+## 10. Validate existing applications
 
 The operational audit covered:
 
 - Pi-hole and Unbound service state plus live DNS queries.
+- No-IP service state, update logs and hostname resolution.
 - WireGuard interface state and recent peer handshake.
 - Samba configuration and active daemons.
 - File Browser and OctoPrint HTTP responses.
 - Immich container health.
 - RetroPie/EmulationStation binary, libraries, logs and OpenGL renderer.
 - Kodi package and executable.
+- zram and fallback swap state.
 - Failed systemd units and boot-level error logs.
 
 The audit found and corrected a stale Samba share that still referenced the
 NVMe's former mount point.
 
-## 9. Repair Pi 5 fan detection
+## 11. Repair Pi 5 fan detection
 
 The system had recorded thermal throttling while Immich processed its initial
 queue. The installed four-wire PWM fan spun at boot but did not register as a
@@ -166,7 +191,7 @@ dtparam=cooling_fan=on
 After reboot, Linux reported `pwm-fan`, RPM feedback was available, and the
 system completed a full-CPU Immich workload without new throttling.
 
-## 10. Detect degraded legacy storage
+## 12. Detect degraded legacy storage
 
 The final boot audit reported unreadable pending sectors on a legacy disk.
 SMART confirmed media degradation despite its high-level result still reading

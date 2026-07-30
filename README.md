@@ -19,6 +19,7 @@ latency-sensitive application data on NVMe.
 | Photo cloud | Immich | Automatic mobile backup, timeline, search, faces and albums |
 | DNS filtering | Pi-hole | Network-wide ad and tracker blocking |
 | Recursive DNS | Unbound | Private recursive resolution for Pi-hole |
+| Dynamic DNS | No-IP DUC | Keeps a private hostname pointed at the home connection |
 | Remote access | WireGuard | Encrypted access without exposing applications publicly |
 | Browser file access | File Browser | Web interface for approved storage roots |
 | LAN file access | Samba | Authenticated SMB shares |
@@ -32,14 +33,19 @@ latency-sensitive application data on NVMe.
 ```mermaid
 flowchart TD
     Clients["Phones and computers"]
+    Router["Home router<br/>DHCP, DNS and VPN forwarding"]
+    DDNS["No-IP DDNS"]
     VPN["WireGuard VPN"]
     Pi["Raspberry Pi 5"]
     NVMe["2 TB NVMe<br/>OS, database, cache, thumbnails"]
     Library["6 TB HDD<br/>photos, videos, archives"]
     Legacy["Legacy USB disk<br/>recovery or secondary copies"]
 
-    Clients -->|"LAN"| Pi
-    Clients -->|"Remote"| VPN
+    Clients -->|"LAN"| Router
+    Clients -->|"Resolve private hostname"| DDNS
+    DDNS --> Router
+    Router -->|"LAN DNS"| Pi
+    Router -->|"One UDP forward"| VPN
     VPN --> Pi
     Pi --> NVMe
     Pi --> Library
@@ -60,12 +66,16 @@ Immich as external libraries.
 - Designed mount dependencies so Docker cannot start Immich before the media
   filesystem is available.
 - Split Immich originals and high-I/O working data across HDD and NVMe.
+- Configured router DHCP to advertise Pi-hole as LAN DNS, with Unbound as its
+  recursive resolver.
+- Combined No-IP dynamic DNS with WireGuard for stable, encrypted remote access.
 - Restricted File Browser to an explicit root instead of exposing `/`.
 - Used read-only container mounts for archived external photo libraries.
 - Diagnosed USB Attached SCSI timeouts and applied a device-specific
   `usb-storage` fallback.
 - Detected and corrected a Pi 5 PWM-fan initialization issue.
 - Used service, HTTP, DNS, VPN, filesystem and SMART checks for validation.
+- Added zram/loopback swap protection and an image-based system recovery plan.
 - Identified a degraded legacy disk during the final operational audit.
 
 ## Repository map
@@ -75,16 +85,21 @@ Immich as external libraries.
 ├── configs/
 │   ├── boot/
 │   ├── immich/
+│   ├── noip/
 │   ├── samba/
 │   ├── storage/
-│   └── systemd/
+│   ├── systemd/
+│   └── wireguard/
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── BUILD_LOG.md
 │   ├── OPERATIONS.md
 │   ├── PORTFOLIO_SUMMARY.md
 │   ├── PUBLISHING.md
+│   ├── REMOTE_ACCESS.md
 │   ├── SECURITY.md
+│   ├── SERVICE_INVENTORY.md
+│   ├── SYSTEM_RESILIENCE.md
 │   └── TROUBLESHOOTING.md
 └── scripts/
     ├── health-check.sh
@@ -111,6 +126,9 @@ Before publishing any local changes:
 - [Architecture](docs/ARCHITECTURE.md)
 - [Build log](docs/BUILD_LOG.md)
 - [Operations runbook](docs/OPERATIONS.md)
+- [Router, DDNS and VPN](docs/REMOTE_ACCESS.md)
+- [Complete service inventory](docs/SERVICE_INVENTORY.md)
+- [Swap, backup and recovery](docs/SYSTEM_RESILIENCE.md)
 - [Security model](docs/SECURITY.md)
 - [Troubleshooting notes](docs/TROUBLESHOOTING.md)
 - [Portfolio summary](docs/PORTFOLIO_SUMMARY.md)
@@ -118,9 +136,9 @@ Before publishing any local changes:
 
 ## Project status
 
-The core platform is operational. Immich, Docker, Pi-hole, Unbound, WireGuard,
-Samba, File Browser and OctoPrint have passed functional checks. Kodi and
-EmulationStation launch correctly with hardware graphics acceleration.
+The core platform is operational. Immich, Docker, Pi-hole, Unbound, No-IP,
+WireGuard, Samba, File Browser and OctoPrint have passed functional checks.
+Kodi and EmulationStation launch correctly with hardware graphics acceleration.
 
 A legacy USB disk was flagged by SMART as degraded and is excluded from the
 trusted storage design pending recovery and replacement.
@@ -132,6 +150,7 @@ trusted storage design pending recovery and replacement.
 - [Docker Engine documentation](https://docs.docker.com/engine/)
 - [Pi-hole documentation](https://docs.pi-hole.net/)
 - [Unbound documentation](https://unbound.docs.nlnetlabs.nl/)
+- [No-IP Linux DUC documentation](https://www.noip.com/support/knowledgebase/install-linux-3-x-dynamic-update-client-duc)
 - [WireGuard documentation](https://www.wireguard.com/quickstart/)
 - [File Browser documentation](https://filebrowser.org/)
 - [OctoPrint documentation](https://docs.octoprint.org/)

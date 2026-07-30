@@ -51,7 +51,7 @@ Do not paste access tokens into shell commands that will be saved in history.
 ## Suggested repository description
 
 > Raspberry Pi 5 private cloud with NVMe boot, tiered storage, Immich, Pi-hole,
-> Unbound, WireGuard, File Browser, Samba, OctoPrint, Kodi and RetroPie.
+> Unbound, No-IP, WireGuard, File Browser, Samba, OctoPrint, Kodi and RetroPie.
 
 ## Suggested topics
 
@@ -62,6 +62,7 @@ homelab
 immich
 docker-compose
 wireguard
+dynamic-dns
 pihole
 unbound
 nas

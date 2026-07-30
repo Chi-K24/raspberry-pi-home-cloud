@@ -7,6 +7,8 @@ Never commit:
 - `.env` files.
 - Database passwords.
 - WireGuard private or preshared keys.
+- WireGuard endpoints, peer identities and internal subnet plans.
+- No-IP credentials or the real DDNS hostname.
 - Full `wg showconf` output.
 - Real LAN or WAN addresses.
 - Filesystem UUIDs or PARTUUIDs.
@@ -25,7 +27,12 @@ The intended design keeps application ports private:
   and through WireGuard.
 - No application is directly port-forwarded from the internet.
 - WireGuard is the single remote-access entry point.
+- The router forwards only the selected WireGuard UDP port.
+- Router DHCP advertises Pi-hole internally; DNS is not exposed to the WAN.
 - Pi-hole and Unbound are not configured as public resolvers.
+
+No-IP provides address discovery only. It does not authenticate users or make a
+service safe to expose.
 
 ## File Browser
 

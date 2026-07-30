@@ -1,0 +1,6 @@
+# Example only. The real file belongs at /etc/default/noip-duc.
+# Use a No-IP DDNS key instead of publishing account credentials.
+NOIP_USERNAME=<DDNS_KEY_USERNAME>
+NOIP_PASSWORD=<DDNS_KEY_PASSWORD>
+NOIP_HOSTNAMES=<DDNS_HOSTNAME>
+

@@ -1,0 +1,12 @@
+# Sanitized split-tunnel client template.
+[Interface]
+Address = <CLIENT_VPN_CIDR>
+DNS = <PIHOLE_VPN_ADDRESS>
+PrivateKey = <CLIENT_PRIVATE_KEY>
+
+[Peer]
+PublicKey = <SERVER_PUBLIC_KEY>
+PresharedKey = <CLIENT_PRESHARED_KEY>
+Endpoint = <DDNS_HOSTNAME>:<WIREGUARD_UDP_PORT>
+AllowedIPs = <HOME_LAN_CIDR>, <VPN_NETWORK_CIDR>
+PersistentKeepalive = 25

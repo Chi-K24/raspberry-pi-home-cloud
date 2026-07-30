@@ -14,6 +14,10 @@ The script is read-only. Review:
 - Local HTTP checks.
 - Mount presence and capacity.
 - Pi temperature, throttling history and fan state.
+- DDNS, VPN and swap state.
+
+The expected state of every project and supporting component is documented in
+[SERVICE_INVENTORY.md](SERVICE_INVENTORY.md).
 
 ## Immich
 
@@ -58,7 +62,17 @@ dig @127.0.0.1 -p 5335 example.com +short
 
 The first query tests Pi-hole. The second tests Unbound directly.
 
-## WireGuard
+After changing router DHCP DNS, renew a client lease and verify that the client
+received the Pi-hole address. Router setup and IPv6 considerations are covered
+in [REMOTE_ACCESS.md](REMOTE_ACCESS.md).
+
+## No-IP and WireGuard
+
+```bash
+systemctl status noip-duc --no-pager
+sudo journalctl -u noip-duc --since today --no-pager
+dig +short <DDNS_HOSTNAME>
+```
 
 ```bash
 systemctl status wg-quick@wg0 --no-pager
@@ -69,6 +83,8 @@ sudo wg show
 the kernel interface remains active.
 
 Never publish the full output of `wg show` if peer metadata must remain private.
+See [REMOTE_ACCESS.md](REMOTE_ACCESS.md) for router, split-tunnel and remote
+validation details.
 
 ## Samba
 
@@ -117,6 +133,16 @@ tail -n 80 "$HOME/.emulationstation/es_log.txt"
 
 Launch tests should be observed on the connected display.
 
+## Kodi
+
+Kodi is a graphical application rather than a required background service:
+
+```bash
+kodi --version
+```
+
+Launch tests should be observed on the connected display.
+
 ## Thermal monitoring
 
 ```bash
@@ -140,6 +166,17 @@ sudo smartctl --scan-open
 
 Do not rely only on SMART's high-level `PASSED` result. Review pending,
 reallocated and uncorrectable sector attributes.
+
+## Swap and recovery
+
+```bash
+swapon --show
+free -h
+zramctl
+```
+
+See [SYSTEM_RESILIENCE.md](SYSTEM_RESILIENCE.md) for system-image verification,
+restore boundaries and the recovery drill.
 
 ## Migration verification
 

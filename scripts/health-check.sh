@@ -47,6 +47,23 @@ do
   service_status "$service"
 done
 
+heading "Supporting services"
+for service in \
+  avahi-daemon \
+  bluetooth \
+  cups \
+  lightdm \
+  smartmontools \
+  unattended-upgrades \
+  winbind \
+  wayvnc-control \
+  samba-ad-dc
+do
+  service_status "$service"
+done
+printf '%s\n' \
+  'Note: samba-ad-dc is expected to be inactive on this standalone Samba host.'
+
 heading "Filesystems"
 findmnt / || true
 findmnt /boot/firmware || true
@@ -76,6 +93,24 @@ if command -v dig >/dev/null 2>&1; then
   dig @127.0.0.1 -p 5335 example.com +short | head -n 1
 else
   printf 'dig is not installed\n'
+fi
+
+heading "Remote access"
+if systemctl list-unit-files noip-duc.service --no-legend 2>/dev/null \
+  | grep -q noip-duc; then
+  service_status "noip-duc"
+else
+  printf '%-20s %s\n' "noip-duc" "not installed"
+fi
+if command -v wg >/dev/null 2>&1; then
+  sudo wg show interfaces 2>/dev/null || wg show interfaces 2>/dev/null || true
+fi
+
+heading "Memory and swap"
+free -h
+swapon --show
+if command -v zramctl >/dev/null 2>&1; then
+  zramctl
 fi
 
 heading "Thermals"

@@ -3,14 +3,15 @@
 ## Short description
 
 Designed and deployed a multi-service Raspberry Pi 5 home-cloud platform with
-NVMe boot, tiered storage, private VPN access, automated photo backup, network
-DNS filtering, web/SMB file access, 3D-printer management and media/emulation
-applications.
+NVMe boot, tiered storage, router-integrated DNS, dynamic DNS, private VPN
+access, automated photo backup, web/SMB file access, 3D-printer management and
+media/emulation applications.
 
 ## Resume bullets
 
 - Architected a Raspberry Pi 5 private-cloud platform combining Immich,
-  Pi-hole, Unbound, WireGuard, Samba, File Browser, OctoPrint, Kodi and RetroPie.
+  Pi-hole, Unbound, No-IP, WireGuard, Samba, File Browser, OctoPrint, Kodi and
+  RetroPie.
 - Migrated the operating system from SD to a 2 TB NVMe drive and validated
   direct NVMe boot, mount integrity and bootloader configuration.
 - Migrated approximately 600 GB of archived data to a 6 TB ext4 storage tier
@@ -19,7 +20,10 @@ applications.
   thumbnails, model cache and read-only external archives across appropriate
   storage tiers.
 - Hardened access by restricting File Browser to allow-listed paths, keeping
-  application ports private and using WireGuard for encrypted remote access.
+  application ports private, advertising Pi-hole through router DHCP, and using
+  No-IP plus WireGuard for encrypted remote access.
+- Added zram/fallback swap protection and a checksum-verified system-image
+  recovery workflow with clearly separated media and database backups.
 - Diagnosed USB/UAS instability, stale Samba paths, Raspberry Pi PWM-fan
   initialization and degraded-disk SMART indicators through Linux service,
   kernel, storage and network tooling.
@@ -32,7 +36,7 @@ applications.
 - Storage planning, GPT, ext4, NTFS and mount management
 - Data migration and integrity verification
 - Docker and Docker Compose
-- Network services, DNS and VPNs
+- Router DHCP/DNS, dynamic DNS and VPNs
 - Security hardening and secrets management
 - Hardware and kernel troubleshooting
 - Operational documentation and incident detection
@@ -58,6 +62,8 @@ and a checksum dry run. The source was retained until both checks succeeded.
 - Mixed ownership in multi-user external photo libraries.
 - Thermal throttling caused by an undetected PWM fan.
 - A failing legacy backup disk that still reported a high-level SMART pass.
+- Changing public addresses without publishing individual application ports.
+- Short memory spikes during Immich machine-learning and transcoding workloads.
 
 ### What would come next?
 

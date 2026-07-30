@@ -1,0 +1,12 @@
+# Sanitized WireGuard server template.
+[Interface]
+Address = <VPN_SERVER_CIDR>
+ListenPort = <WIREGUARD_UDP_PORT>
+PrivateKey = <SERVER_PRIVATE_KEY>
+
+[Peer]
+# One separately generated peer block per client.
+PublicKey = <CLIENT_PUBLIC_KEY>
+PresharedKey = <CLIENT_PRESHARED_KEY>
+AllowedIPs = <CLIENT_VPN_CIDR>
+

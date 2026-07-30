@@ -30,6 +30,12 @@ check_pattern "private key material" \
 check_pattern "WireGuard secrets" \
   '(PrivateKey|PresharedKey)[[:space:]]*=[[:space:]]*[A-Za-z0-9+/]{20,}'
 
+check_pattern "WireGuard endpoints" \
+  'Endpoint[[:space:]]*=[[:space:]]*[^<[:space:]][^[:space:]]*'
+
+check_pattern "No-IP configuration" \
+  'NOIP_(USERNAME|PASSWORD|HOSTNAMES)[[:space:]]*=[[:space:]]*[^<[:space:]][^[:space:]]*'
+
 check_pattern "committed passwords" \
   '(DB_PASSWORD|PASSWORD|TOKEN|SECRET)[[:space:]]*=[[:space:]]*[^[:space:]]{8,}'
 
