@@ -1,0 +1,14 @@
+[Unit]
+Description=File Browser Web UI
+After=network.target
+RequiresMountsFor=/srv/filebrowser
+
+[Service]
+User=YOUR_USER
+WorkingDirectory=/srv/filebrowser
+ExecStart=/usr/local/bin/filebrowser -r /srv/filebrowser --address 0.0.0.0 --port 8080 --database /var/lib/filebrowser/filebrowser.db
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,5 @@
+services:
+  immich-server:
+    volumes:
+      - ${IMMICH_THUMBS_LOCATION}:/data/thumbs
+      - ${IMMICH_EXTERNAL_LIBRARY}:/external/archive:ro

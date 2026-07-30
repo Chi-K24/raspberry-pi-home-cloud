@@ -1,0 +1,5 @@
+# Add beneath an [all] section when a compatible Pi 5 PWM fan spins at boot
+# but is not registered as a Linux cooling device.
+
+[all]
+dtparam=cooling_fan=on

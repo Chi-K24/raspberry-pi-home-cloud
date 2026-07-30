@@ -1,0 +1,4 @@
+# /boot/firmware/cmdline.txt must remain a single line.
+# Append only after replacing the placeholder with the affected USB VID:PID.
+
+usb-storage.quirks=<VID>:<PID>:u

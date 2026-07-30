@@ -1,0 +1,101 @@
+# Architecture
+
+## Design goals
+
+1. Boot and run databases from fast, resilient NVMe storage.
+2. Keep large original photos and videos on a high-capacity ext4 disk.
+3. Avoid exposing private services directly to the public internet.
+4. Keep existing archives immutable until migration and ownership are verified.
+5. Allow browser and SMB access without exposing the full Linux filesystem.
+6. Make storage failures visible through repeatable health checks.
+
+## Storage tiers
+
+| Tier | Example mount | Workload |
+| --- | --- | --- |
+| NVMe system tier | `/` | OS, Docker, PostgreSQL, caches and application state |
+| Media tier | `/srv/immich-library` | Immich originals, database dumps and archives |
+| Web file root | `/srv/filebrowser` | Approved folders and bind-mounted storage |
+| Legacy/recovery tier | `/mnt/legacy-usb` | Temporary access to old disks; not trusted |
+
+### Immich placement
+
+```text
+/srv/immich-library/
+├── immich-managed/
+│   ├── library/           # Uploaded originals
+│   ├── encoded-video/     # Generated video variants
+│   ├── profile/
+│   └── backups/           # Database dumps; not media backups
+└── import-staging/        # Existing archive, mounted read-only
+
+/srv/immich-data/
+├── postgres/              # NVMe
+└── thumbs/                # NVMe
+```
+
+The Immich server sees:
+
+| Host path | Container path | Mode |
+| --- | --- | --- |
+| `/srv/immich-library/immich-managed` | `/data` | read/write |
+| `/srv/immich-data/thumbs` | `/data/thumbs` | read/write |
+| `/srv/immich-library/import-staging` | `/external/archive` | read-only |
+
+## Service dependency design
+
+Docker is configured with:
+
+```ini
+[Unit]
+RequiresMountsFor=/srv/immich-library
+```
+
+This prevents a dangerous failure mode where Docker starts while the external
+disk is absent and silently writes media into an empty directory on the root
+filesystem.
+
+## Access model
+
+```mermaid
+flowchart LR
+    Local["Local devices"]
+    Remote["Remote devices"]
+    VPN["WireGuard"]
+    Services["Private services"]
+    Storage["Approved storage"]
+
+    Local --> Services
+    Remote --> VPN
+    VPN --> Services
+    Services --> Storage
+```
+
+- LAN clients connect directly to private service addresses.
+- Remote clients connect through WireGuard.
+- No Immich, File Browser, OctoPrint or SMB port needs public forwarding.
+- File Browser is rooted at `/srv/filebrowser`, not `/`.
+- Existing photo archives are mounted read-only inside Immich.
+
+## Data ownership
+
+Immich users receive separate storage labels, producing a layout such as:
+
+```text
+library/UserA/2026/2026-07-29/photo.jpg
+library/UserB/2026/2026-07-29/photo.jpg
+```
+
+External libraries are created separately for each owner because Immich library
+ownership cannot be changed after creation.
+
+## Backup boundaries
+
+An Immich database dump contains metadata and relationships, not the original
+media. A recoverable backup requires both:
+
+1. PostgreSQL/database dumps and configuration.
+2. A separate copy of the complete Immich media directory.
+
+The legacy USB disk in this build is not considered a valid backup target after
+SMART reported unreadable sectors.

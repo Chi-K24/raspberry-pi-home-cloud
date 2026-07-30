@@ -1,0 +1,33 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.conf.local
+secrets/
+
+# Runtime data
+postgres/
+library/
+thumbs/
+backups/
+model-cache/
+recovery/
+*.img
+*.img.gz
+*.map
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*~
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

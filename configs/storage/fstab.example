@@ -1,0 +1,10 @@
+# Replace every placeholder with values from lsblk -f or blkid.
+
+PARTUUID=<BOOT_PARTUUID>  /boot/firmware  vfat  defaults          0  2
+PARTUUID=<ROOT_PARTUUID>  /               ext4  defaults,noatime  0  1
+
+UUID=<MEDIA_DISK_UUID>  /srv/immich-library  ext4  defaults,noatime,nofail,x-systemd.device-timeout=30  0  2
+UUID=<LEGACY_DISK_UUID> /mnt/legacy-usb      ntfs-3g defaults,nofail,uid=1000,gid=1000                0  0
+
+/srv/immich-library  /srv/filebrowser/Immich_Storage  none  bind  0  0
+/mnt/legacy-usb      /srv/filebrowser/Legacy_Storage  none  bind  0  0
