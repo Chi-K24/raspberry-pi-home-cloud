@@ -93,6 +93,7 @@ Immich as external libraries.
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── BUILD_LOG.md
+│   ├── MEDIA_AND_EMULATION.md
 │   ├── OPERATIONS.md
 │   ├── PORTFOLIO_SUMMARY.md
 │   ├── PUBLISHING.md
@@ -125,6 +126,7 @@ Before publishing any local changes:
 
 - [Architecture](docs/ARCHITECTURE.md)
 - [Build log](docs/BUILD_LOG.md)
+- [Kodi and RetroPie media console](docs/MEDIA_AND_EMULATION.md)
 - [Operations runbook](docs/OPERATIONS.md)
 - [Router, DDNS and VPN](docs/REMOTE_ACCESS.md)
 - [Complete service inventory](docs/SERVICE_INVENTORY.md)
@@ -154,6 +156,7 @@ trusted storage design pending recovery and replacement.
 - [WireGuard documentation](https://www.wireguard.com/quickstart/)
 - [File Browser documentation](https://filebrowser.org/)
 - [OctoPrint documentation](https://docs.octoprint.org/)
+- [Kodi Wiki](https://kodi.wiki/)
 - [RetroPie documentation](https://retropie.org.uk/docs/)
 
 ## License
