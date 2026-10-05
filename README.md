@@ -26,7 +26,7 @@ latency-sensitive application data on NVMe.
 | 3D printing | OctoPrint | Remote printer monitoring and control |
 | Media center | Kodi | Local media playback |
 | Emulation | RetroPie / EmulationStation | Local game launcher |
-| Automotive reference server | LEMON | Rust application deployed as a native systemd service |
+| Automotive reference server | LEMON | Responsive manuals workspace with native systemd service management |
 | Containers | Docker Compose | Immich application stack |
 
 ## Architecture
@@ -79,8 +79,9 @@ Immich as external libraries.
 - Added zram/loopback swap protection and an image-based system recovery plan.
 - Identified a degraded legacy disk during the final operational audit.
 
-- Deployed the upstream LEMON manuals server on Raspberry Pi and confirmed its
-  native `lemon.service` unit was enabled and running.
+- Customized the upstream LEMON frontend with responsive navigation, local
+  bookmarks, current-index filtering, reading tools and diagram zoom; tested
+  browser behaviour, rebuilt on the Pi and confirmed the new interface working.
 
 ## Repository map
 
@@ -134,7 +135,7 @@ Before publishing any local changes:
 - [Build log](docs/BUILD_LOG.md)
 - [Immich storage architecture and verified migration](docs/IMMICH_STORAGE_MIGRATION.md)
 - [Kodi and RetroPie media console](docs/MEDIA_AND_EMULATION.md)
-- [LEMON manuals deployment](docs/LEMON_MANUALS.md)
+- [LEMON responsive UI and deployment](docs/LEMON_MANUALS.md)
 - [Operations runbook](docs/OPERATIONS.md)
 - [Router, DDNS and VPN](docs/REMOTE_ACCESS.md)
 - [Complete service inventory](docs/SERVICE_INVENTORY.md)

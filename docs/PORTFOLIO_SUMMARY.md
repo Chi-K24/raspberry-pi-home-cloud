@@ -30,8 +30,10 @@ media/emulation applications.
 - Built a repeatable operational runbook and automated health checks covering
   systemd, HTTP endpoints, containers, DNS, VPN, mounts and thermals.
 
-- Deployed the upstream Rust-based LEMON manuals server on Raspberry Pi as a
-  native systemd service and verified its enabled/running state.
+- Customized the upstream LEMON frontend with responsive desktop/mobile
+  navigation, local bookmarks, index filtering and diagram zoom using vanilla
+  JavaScript and CSS; validated browser behaviour with Chromium and deployed
+  the rebuilt Rust application on Raspberry Pi with backup/rollback support.
 
 ## Skills demonstrated
 

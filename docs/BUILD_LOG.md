@@ -213,3 +213,18 @@ The retained evidence establishes initial service startup. A reboot test,
 browser/manual-page validation and exact build troubleshooting history were not
 retained. See [LEMON deployment notes](LEMON_MANUALS.md) for the build reference,
 operations commands, attribution and verification limits.
+
+## 14. Redesign and deploy the LEMON frontend — October 5, 2026
+
+Added a responsive desktop workspace and mobile drawer, local saved pages and
+recent history, current-index filtering, light/dark themes, reading controls,
+printing and a diagram viewer. Only the frontend CSS and JavaScript changed;
+the Rust backend and manuals database remained unchanged.
+
+Chromium tests passed on synthetic pages for navigation, filtering, persistence,
+image controls, mobile layout and corrupt/blocked browser storage. The installer
+backed up the previous frontend and binary and rebuilt the existing Pi source
+successfully in 24.40 seconds (incremental release build). After checking the
+service executable and receiving restart instructions, the operator confirmed
+the redesigned interface was working. See [the case study](LEMON_MANUALS.md)
+for the test scope, remaining real-data checks and rollback approach.

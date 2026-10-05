@@ -1,93 +1,121 @@
-# LEMON Manuals on Raspberry Pi
+# LEMON Workspace — Responsive Manuals UI on Raspberry Pi
 
 ## Project scope
 
-Deployment of the upstream LEMON automotive manuals server on the Raspberry Pi
-home-cloud host, completed October 4, 2026. The portfolio contribution is Linux
-application deployment and service administration. LEMON's application code,
-manuals, database engines and web interface are upstream work.
+Deployed the upstream Rust-based LEMON manuals server on Raspberry Pi, then
+customized its frontend for desktop and mobile use. Initial service setup was
+completed October 4, 2026; the redesigned interface was compiled and confirmed
+working on the Pi on October 5.
 
-This repository contains deployment documentation only. It does not contain
-manual pages, database archives, upstream source code or compiled binaries.
-The repository's MIT license applies to its own material, not to LEMON or any
-third-party manual content.
+The contribution covers frontend customization, Linux deployment, browser
+testing and operational documentation. LEMON supplies the server, database
+engines, original interface and manual content. The Rust backend and database
+files were unchanged by the UI update.
 
-## What was established
+This repository documents the work; it does not distribute manual databases,
+upstream source archives or compiled binaries. Its MIT license does not extend
+to third-party LEMON or manual content.
 
-- Reviewed the bundled Linux/ARM instructions and Rust source archive.
-- Identified that supplied Linux executables target x86_64, while the
-  Raspberry Pi requires the upstream source-build route.
-- Deployed a native service named `lemon.service`.
-- Confirmed systemd loaded the unit from `/etc/systemd/system/lemon.service`.
-- Confirmed the unit was enabled and `active (running)`, with a
-  `lemon-website` main process, in the October 4 setup status capture.
+## Interface improvements
 
-The deployment files were on mounted USB storage. These public notes omit
-personal identifiers, hostnames, network addresses and original download paths.
+| Area | Implemented behaviour |
+| --- | --- |
+| Desktop navigation | Workspace sidebar with vehicle breadcrumbs, saved pages and recent history |
+| Mobile navigation | Responsive drawer with keyboard focus management and touch-friendly controls |
+| Index filtering | Filters entries on the current page, including nested groups and an empty-results message |
+| Folder navigation | Separate expand/collapse buttons, remembered expansion state and deep-link reveal |
+| Personal workspace | Saved pages and recent history in browser storage, with a clear-history control |
+| Reading | Light/dark themes, text sizing, focus view and print styles |
+| Diagrams | Keyboard-operated image viewer with zoom and scroll-to-pan |
+| Compatibility | Linked images, image maps and CHARM hotspots retain their original navigation |
+| Layout | Scrollable tables and constrained images on narrow screens |
 
-## Source-build reference
+Filtering searches only the currently loaded index, not all manuals or the
+server database. Saved pages and history stay in the current browser/origin.
+This is a responsive website, not an installable or offline PWA.
 
-The bundled upstream instructions specify a Rust toolchain and a C toolchain,
-then the following command from the extracted source directory:
+## Implementation choices
+
+Only `src/html/script.js` and `src/html/style.css` changed application behaviour.
+The interface enhances the existing generated HTML and uses the actual
+breadcrumb destinations. No frontend framework, external font, CDN, analytics
+or new server dependency was added.
+
+Storage access is guarded so blocked or malformed browser storage does not
+break navigation. Folder state is restored after filtering, and malformed URL
+fragments are handled without crashing initialization. The diagram viewer
+preserves original image colours instead of recolouring technical diagrams
+for dark mode.
+
+No performance benchmark or database-wide search speedup is claimed.
+
+## Build and deployment
+
+The upstream Linux binaries target x86_64, so the Raspberry Pi uses a native
+source build with Rust and C tooling. The update helper:
+
+1. Backs up the existing CSS, JavaScript and release binary.
+2. Copies only the two frontend files into the existing source tree, preserving
+   any local ARM/Rust fixes.
+3. Runs `cargo build --release --locked` with an explicit target directory.
+4. Restores the previous frontend sources if the build fails.
+5. Leaves the service restart to the operator after checking the executable path.
+
+The October 5 build completed successfully in **24.40 seconds** as an incremental
+release build on the existing installation; this is not a clean-build benchmark.
+Six upstream `oxidized-mtbl` deprecation warnings were non-fatal.
+
+The service executable was verified to point to the rebuilt
+`target/release/lemon-website`. After the restart instructions, the operator
+confirmed that the new interface was working.
+
+The inspected unit also includes a storage-mount requirement and
+`Restart=on-failure`. Hostnames, account names, IP addresses, listening details,
+download identifiers and private filesystem paths are omitted.
+
+## Validation and limits
+
+**Automated Chromium tests on synthetic pages passed for:**
+
+- Current-index filtering, nested matches, clearing and folder-state restoration.
+- Saved-page persistence.
+- Deep links into collapsed groups and malformed fragment handling.
+- Image viewer zoom and Escape dismissal; exclusion of hotspot images.
+- Theme switching and mobile drawer behaviour.
+- No horizontal document overflow at 390- and 320-pixel viewport widths.
+- Invalid or blocked browser storage and failed-save feedback.
+
+Desktop and mobile screenshots were visually reviewed using synthetic content.
+The native Pi build succeeded and the operator confirmed live operation.
+
+That confirmation is not an exhaustive audit of every manual or every feature.
+Real-data CHARM compatibility, generated offline ZIPs, reboot recovery and
+long-term stability remain to be checked.
+
+## Operations and rollback
+
+Inspect the configured binary and service state:
 
 ```bash
-cargo build --release
-```
-
-The documented output is `target/release/lemon-website`. The source archive
-contains `Cargo.toml`, `Cargo.lock`, Rust application modules, LEMON and CHARM
-database-engine modules, web assets and a vendored `oxidized-mtbl` dependency.
-
-This is the upstream build procedure, not a retained compiler log. Exact
-compiler versions, package-install commands and any local build fixes were not
-captured in the available record.
-
-## Service operations
-
-Inspect configuration and state on the Raspberry Pi:
-
-```bash
-systemctl cat lemon.service
-systemctl is-enabled lemon.service
-systemctl is-active lemon.service
+systemctl show lemon.service --property=ExecStart --no-pager
 systemctl status lemon.service --no-pager -l
-journalctl -u lemon.service -b --no-pager -n 100
+journalctl -u lemon.service -b --no-pager -n 50
 ```
 
-Restart after an intentional application change:
+After a successful build and executable-path check:
 
 ```bash
 sudo systemctl restart lemon.service
-systemctl status lemon.service --no-pager -l
 ```
 
-If the unit file itself changes, run `sudo systemctl daemon-reload` before
-restarting it. The exact deployed unit contents were not retained, so this
-repository does not present a reconstructed unit as the installed configuration.
-
-## Verification boundaries and next checks
-
-The captured status showed the process running approximately three seconds
-after startup. That confirms initial service startup, not long-term stability
-or successful manual-page rendering.
-
-Before treating the deployment as fully validated:
-
-1. Inspect the installed unit for its executable, working directory, data-index
-   arguments, service user and configured listening address/port.
-2. Confirm the mounted data filesystem is available and the service user can
-   read the selected indexes and database files. Check mount dependencies for
-   boot-time startup when using external storage.
-3. Open the configured endpoint and load a representative manual page and image.
-4. Check service logs for index-loading or missing-data errors.
-5. During a planned reboot, verify the service starts with its storage mounted.
-
-Upstream documents port 8080 as its default. The deployed port, bind address,
-loaded datasets, restart policy and VPN reachability were not established by
-the retained status output and are not claimed here.
+Hard-refresh the browser to reload the embedded CSS and JavaScript.
+The UI assets are included in the compiled binary, so source edits require a
+rebuild. Rollback uses the saved frontend files and previous binary; stop the
+service before replacing a running executable, then start it again.
+The update helper does not modify the manuals database.
 
 ## Attribution
 
-The bundled LEMON instructions and source listing are the basis of the build
-notes. LEMON's included README credits Operation CHARM for advice and use of
-its web design. This deployment does not claim authorship of either project.
+LEMON and its contributors provide the upstream application and content.
+LEMON's included README credits Operation CHARM for advice and its web design.
+The responsive workspace is a frontend customization of that application.
