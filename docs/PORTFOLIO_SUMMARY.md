@@ -30,6 +30,9 @@ media/emulation applications.
 - Built a repeatable operational runbook and automated health checks covering
   systemd, HTTP endpoints, containers, DNS, VPN, mounts and thermals.
 
+- Deployed the upstream Rust-based LEMON manuals server on Raspberry Pi as a
+  native systemd service and verified its enabled/running state.
+
 ## Skills demonstrated
 
 - Linux administration and systemd

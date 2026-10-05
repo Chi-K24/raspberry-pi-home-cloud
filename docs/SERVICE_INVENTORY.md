@@ -16,6 +16,7 @@ optional operating-system components.
 | File Browser | `filebrowser.service` | active | Local HTTP response |
 | OctoPrint | `octoprint.service` | active | Local HTTP redirect or page |
 | Docker | `docker.service`, `containerd.service` | active | Engine and Compose respond |
+| LEMON manuals | `lemon.service` | enabled; active (running) in setup capture | `systemctl status lemon.service`; page and reboot checks remain to be recorded |
 | Immich | Docker Compose stack | healthy | All containers healthy and API pong |
 
 ## Supporting services

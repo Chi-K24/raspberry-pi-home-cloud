@@ -197,3 +197,19 @@ The final boot audit reported unreadable pending sectors on a legacy disk.
 SMART confirmed media degradation despite its high-level result still reading
 `PASSED`. The disk was removed from the trusted backup plan and marked for
 recovery/replacement.
+
+## 13. Deploy the LEMON manuals server — October 4, 2026
+
+Reviewed the upstream Linux and Raspberry Pi instructions and bundled Rust
+source tree. Supplied Linux binaries target x86_64; upstream directs ARM users
+to build from source using Rust/C tooling and `cargo build --release`.
+
+Deployed a native systemd unit named `lemon.service`, described as
+`LEMON Manuals Server`. The captured status confirmed the unit was loaded from
+`/etc/systemd/system/lemon.service`, enabled, and `active (running)`, with a
+`lemon-website` main process.
+
+The retained evidence establishes initial service startup. A reboot test,
+browser/manual-page validation and exact build troubleshooting history were not
+retained. See [LEMON deployment notes](LEMON_MANUALS.md) for the build reference,
+operations commands, attribution and verification limits.
